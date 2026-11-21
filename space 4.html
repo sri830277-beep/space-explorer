@@ -1,0 +1,771 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPACE EXPLORER 23.0</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#030612;color:#e8f5ff;font-family:Arial,sans-serif}
+header{text-align:center;padding:22px;background:linear-gradient(120deg,#171345,#00445c)}
+h1{margin:0;color:#00eeff;letter-spacing:3px}
+header p{color:#d3dfff}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;padding:12px;background:#080e21;position:sticky;top:0;z-index:10}
+button,select,input{accent-color:#00eaff}
+button,select{background:#132747;color:white;border:1px solid #00d9f5;border-radius:6px;padding:10px;cursor:pointer}
+button:hover{background:#00677e}
+button:disabled{opacity:.5;cursor:not-allowed}
+.active{background:#007b94}
+main{max-width:1150px;margin:auto;padding:14px}
+.page{display:none}.page.show{display:block}
+.panel{background:#0a142a;border:1px solid #1c3c59;border-radius:12px;padding:16px;margin-bottom:14px}
+h2{color:#00eaff;margin-top:0}
+h3{color:#8ceaff}
+canvas{display:block;width:100%;background:#02040d;border:1px solid #17405b;border-radius:8px}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.card{background:#112440;padding:12px;border-radius:8px;overflow-wrap:anywhere}
+.card strong{display:block;color:#00eaff;margin-bottom:6px}
+.small{font-size:13px;color:#9cb5d0}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+td,th{padding:9px;border:1px solid #29425b;text-align:left}
+th{color:#00eaff}
+.answer{display:block;width:100%;text-align:left;margin:7px 0}
+#countdown{text-align:center;font-size:40px;color:#00eaff}
+#status{color:#68ffb4;font-weight:bold}
+footer{text-align:center;padding:20px;color:#8ba7c4}
+input[type=range]{max-width:150px}
+label{font-size:14px}
+.orbit-display{height:340px;position:relative;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle,#101d42,#02040d 72%);border:1px solid #17405b;border-radius:12px;margin:16px 0}
+.mini-solar{width:270px;height:270px;position:relative;display:grid;place-items:center}
+.mini-sun{width:38px;height:38px;border-radius:50%;background:#ffca48;box-shadow:0 0 20px #ff9c32,0 0 50px #ff762c;z-index:2}
+.mini-orbit{position:absolute;width:var(--orbit);height:var(--orbit);border:1px solid #4a91bd55;border-radius:50%;animation:miniRevolve var(--speed) linear infinite}
+.mini-planet{position:absolute;top:-5px;left:50%;width:var(--size);height:var(--size);border-radius:50%;background:var(--planet-color);box-shadow:0 0 10px var(--planet-color);transform:translateX(-50%)}
+@keyframes miniRevolve{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.status-good{color:#68ffb4}
+.status-warn{color:#ffd477}
+@media(max-width:600px){
+ header{padding:18px 8px}
+ h1{font-size:23px;letter-spacing:2px}
+ main{padding:8px}
+ .panel{padding:12px}
+ td,th{padding:6px;font-size:12px}
+ #countdown{font-size:32px}
+}
+</style>
+</head>
+
+<body>
+<header>
+<h1>SPACE EXPLORER 23.0</h1>
+<p>ULTIMATE GALACTIC COMMAND CENTER</p>
+<div>MISSION STATUS: <span id="status">SYSTEM ONLINE</span></div>
+</header>
+
+<nav>
+<button class="active" onclick="tab('home',this)">Command Center</button>
+<button onclick="tab('solar',this)">Solar System</button>
+<button onclick="tab('pilot',this)">Space Pilot</button>
+<button onclick="tab('mars',this)">Mars Landing</button>
+<button onclick="tab('blackhole',this)">Black Hole Lab</button>
+<button onclick="tab('research',this)">Planet Research</button>
+<button onclick="tab('mission',this)">Mission Control</button>
+<button onclick="tab('lab',this)">Planet Lab</button>
+<button onclick="tab('quiz',this)">Space Academy</button>
+<button onclick="fullScreen()">Fullscreen</button>
+</nav>
+
+<main>
+<section id="home" class="page show">
+<div class="panel">
+<h2>Welcome, Commander!</h2>
+<p>Explore the planets, pilot a spacecraft, land on Mars, investigate black holes and complete your missions.</p>
+
+<div class="orbit-display">
+ <div class="mini-solar">
+  <div class="mini-sun"></div>
+  <div class="mini-orbit" style="--orbit:55px;--speed:4s"><span class="mini-planet" style="--size:6px;--planet-color:#aaa9ad"></span></div>
+  <div class="mini-orbit" style="--orbit:80px;--speed:6s"><span class="mini-planet" style="--size:8px;--planet-color:#e5b66d"></span></div>
+  <div class="mini-orbit" style="--orbit:110px;--speed:8s"><span class="mini-planet" style="--size:9px;--planet-color:#38a9ff"></span></div>
+  <div class="mini-orbit" style="--orbit:140px;--speed:10s"><span class="mini-planet" style="--size:7px;--planet-color:#f06443"></span></div>
+  <div class="mini-orbit" style="--orbit:170px;--speed:13s"><span class="mini-planet" style="--size:13px;--planet-color:#d5a77c"></span></div>
+  <div class="mini-orbit" style="--orbit:200px;--speed:16s"><span class="mini-planet" style="--size:11px;--planet-color:#e8d39a"></span></div>
+  <div class="mini-orbit" style="--orbit:230px;--speed:20s"><span class="mini-planet" style="--size:9px;--planet-color:#8ce8e8"></span></div>
+  <div class="mini-orbit" style="--orbit:260px;--speed:24s"><span class="mini-planet" style="--size:9px;--planet-color:#567cff"></span></div>
+ </div>
+</div>
+
+<div class="grid">
+<div class="card"><strong>PLANETS</strong>8 worlds to explore</div>
+<div class="card"><strong>MISSIONS</strong>Launch, pilot and land</div>
+<div class="card"><strong>SCIENCE LAB</strong>Planet comparisons</div>
+<div class="card"><strong>SPACE ACADEMY</strong>Test your knowledge</div>
+</div>
+
+<h3>Mission Launch Countdown</h3>
+<div id="countdown">READY</div>
+<div class="controls">
+<button onclick="countdownStart()">Start Countdown</button>
+<button onclick="countdownReset()">Reset Countdown</button>
+</div>
+<p id="countText">Commander, prepare for launch.</p>
+</div>
+
+<div class="panel">
+<h2>Live Mission Log</h2>
+<div id="log">[SYSTEM] Command center initialized.</div>
+</div>
+</section>
+
+<section id="solar" class="page">
+<div class="panel">
+<h2>01 / Solar System Explorer</h2>
+<p>Watch all eight planets revolve around the Sun. Click near a planet to view its information.</p>
+<canvas id="solarCanvas" width="1000" height="560"></canvas>
+<div class="controls">
+<button onclick="solarPaused=!solarPaused;this.textContent=solarPaused?'Resume Orbit':'Pause Orbit'">Pause Orbit</button>
+<button onclick="solarAngle=0">Reset Orbits</button>
+<label>Speed <input id="speed" type="range" min="1" max="10" value="4"></label>
+<label><input type="checkbox" id="orbits" checked> Show orbits</label>
+</div>
+<div class="grid" id="planetInfo"></div>
+<p class="small">Planet distances, sizes and orbital speeds are simplified for visualization.</p>
+</div>
+</section>
+
+<section id="pilot" class="page">
+<div class="panel">
+<h2>02 / Space Pilot</h2>
+<p>Use the arrow keys or W, A, S, D to move. Avoid asteroids and collect energy crystals!</p>
+<canvas id="pilotCanvas" width="900" height="440"></canvas>
+<div class="controls">
+<button onclick="startPilot()">Start / Restart Flight</button>
+<button onclick="stopPilot()">Pause Flight</button>
+</div>
+<div class="grid">
+<div class="card"><strong>ENERGY CRYSTALS</strong><span id="crystals">0</span></div>
+<div class="card"><strong>FLIGHT STATUS</strong><span id="flightStatus">READY</span></div>
+<div class="card"><strong>CONTROLS</strong>Arrow keys / WASD</div>
+</div>
+<p class="small">On a touchscreen, tap the game area to move your ship toward that position.</p>
+</div>
+</section>
+
+<section id="mars" class="page">
+<div class="panel">
+<h2>03 / Mars Landing Simulator</h2>
+<p>Guide the lander horizontally. Try to land gently on the marked landing zone.</p>
+<canvas id="marsCanvas" width="900" height="440"></canvas>
+<div class="controls">
+<button onclick="startLanding()">Begin Landing</button>
+<button onclick="resetLanding()">Reset Lander</button>
+</div>
+<p id="landingStatus">Awaiting landing sequence.</p>
+<p class="small">Simplified educational physics; not a real spacecraft flight model.</p>
+</div>
+</section>
+
+<section id="blackhole" class="page">
+<div class="panel">
+<h2>04 / Black Hole Laboratory</h2>
+<p>Observe a simulated black hole and its glowing accretion disk.</p>
+<canvas id="blackCanvas" width="900" height="480"></canvas>
+<div class="controls">
+<label>Disk speed <input id="diskSpeed" type="range" min="1" max="10" value="4"></label>
+<button onclick="toggleBlack()" id="blackButton">Pause Disk</button>
+</div>
+<p class="small">Illustrative animation, not a numerical general-relativity simulation.</p>
+</div>
+</section>
+
+<section id="research" class="page">
+<div class="panel">
+<h2>05 / Planet Research Lab</h2>
+<div class="controls">
+<label>Planet A <select id="planetA" onchange="compare()"></select></label>
+<label>Planet B <select id="planetB" onchange="compare()"></select></label>
+</div>
+<div id="comparison"></div>
+<h3>Random Space Fact</h3>
+<p id="fact">Jupiter is the largest planet in our Solar System.</p>
+<button onclick="newFact()">Discover Another Fact</button>
+</div>
+</section>
+
+<section id="mission" class="page">
+<div class="panel">
+<h2>06 / Mission Control</h2>
+<p>Select a destination and launch a simulated exploration mission.</p>
+<div class="controls">
+<label>Destination
+<select id="destination">
+<option value="Venus">Venus</option>
+<option value="Mars" selected>Mars</option>
+<option value="Jupiter">Jupiter</option>
+<option value="Saturn">Saturn</option>
+<option value="Neptune">Neptune</option>
+</select>
+</label>
+<button onclick="launchMission()">Launch Mission</button>
+<button onclick="resetMission()">Reset Mission</button>
+</div>
+<canvas id="missionCanvas" width="900" height="360"></canvas>
+<h3 id="missionStatus">Awaiting mission instructions.</h3>
+<div style="background:#152642;border-radius:8px;overflow:hidden;height:18px">
+<div id="missionProgress" style="width:0%;height:100%;background:#00eaff;transition:width .3s"></div>
+</div>
+<p id="missionDetails" class="small">Choose a destination to begin.</p>
+</div>
+</section>
+
+<section id="lab" class="page">
+<div class="panel">
+<h2>07 / Planet Lab</h2>
+<p>Select a planet to inspect its properties and explore a research summary.</p>
+<div class="controls">
+<label>Planet
+<select id="labPlanet" onchange="showLabPlanet()"></select>
+</label>
+</div>
+<div class="grid" id="labInfo"></div>
+<h3>Research Summary</h3>
+<p id="labSummary"></p>
+<button onclick="randomLabPlanet()">Explore a Random Planet</button>
+</div>
+</section>
+
+<section id="quiz" class="page">
+<div class="panel">
+<h2>08 / Space Academy</h2>
+<p>Answer ten questions and see your final score.</p>
+<div id="quizContent"></div>
+<p id="quizFeedback"></p>
+<p id="quizScore">Score: 0</p>
+<button onclick="startQuiz()">Restart Quiz</button>
+</div>
+</section>
+</main>
+
+<footer>SPACE EXPLORER 23.0 | COMPUTER SCIENCE SCIENCE EXPO</footer>
+
+<script>
+function $(id){return document.getElementById(id)}
+
+function tab(id,button){
+document.querySelectorAll(".page").forEach(function(p){p.classList.remove("show")});
+$(id).classList.add("show");
+document.querySelectorAll("nav button").forEach(function(b){b.classList.remove("active")});
+button.classList.add("active");
+logMessage("Opened "+id+" module.");
+}
+
+function fullScreen(){
+if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+document.documentElement.requestFullscreen().catch(function(){});
+}else if(document.exitFullscreen){
+document.exitFullscreen().catch(function(){});
+}
+}
+
+function logMessage(msg){
+$("log").innerHTML="[SYSTEM] "+msg+"<br>"+$("log").innerHTML;
+}
+
+var planets=[
+{name:"Mercury",color:"#aaa9ad",size:4,orbit:62,diameter:"4,879 km",gravity:"3.7 m/s²",year:"88 days",distance:"57.9 million km",temp:"167°C average",type:"Rocky",moons:0,summary:"Mercury is the smallest planet and the closest to the Sun. It has a heavily cratered surface and almost no substantial atmosphere."},
+{name:"Venus",color:"#e5b66d",size:7,orbit:98,diameter:"12,104 km",gravity:"8.87 m/s²",year:"225 days",distance:"108.2 million km",temp:"464°C average",type:"Rocky",moons:0,summary:"Venus has a dense carbon dioxide atmosphere and clouds of sulfuric acid. Its powerful greenhouse effect makes it the hottest planet."},
+{name:"Earth",color:"#38a9ff",size:8,orbit:136,diameter:"12,742 km",gravity:"9.81 m/s²",year:"365.25 days",distance:"149.6 million km",temp:"15°C average",type:"Rocky",moons:1,summary:"Earth has liquid water on its surface and is the only world currently known to support life. Its atmosphere helps regulate the climate."},
+{name:"Mars",color:"#f06443",size:6,orbit:174,diameter:"6,779 km",gravity:"3.71 m/s²",year:"687 days",distance:"227.9 million km",temp:"−65°C average",type:"Rocky",moons:2,summary:"Mars is a cold, rocky world with a thin atmosphere. It has ancient river-like features and Olympus Mons, one of the largest volcanoes known."},
+{name:"Jupiter",color:"#d5a77c",size:17,orbit:235,diameter:"139,820 km",gravity:"24.79 m/s²",year:"11.86 Earth years",distance:"778.6 million km",temp:"−110°C cloud tops",type:"Gas giant",moons:101,summary:"Jupiter is the largest planet. Its atmosphere contains colourful cloud bands, powerful storms and the Great Red Spot."},
+{name:"Saturn",color:"#e8d39a",size:14,orbit:300,diameter:"116,460 km",gravity:"10.44 m/s²",year:"29.45 Earth years",distance:"1.43 billion km",temp:"−140°C cloud tops",type:"Gas giant",moons:274,summary:"Saturn is a gas giant famous for its extensive ring system, made mainly of ice and rocky particles."},
+{name:"Uranus",color:"#8ce8e8",size:11,orbit:360,diameter:"50,724 km",gravity:"8.69 m/s²",year:"84 Earth years",distance:"2.87 billion km",temp:"−195°C average",type:"Ice giant",moons:28,summary:"Uranus is an ice giant that rotates with an extreme axial tilt. Its blue-green appearance comes mainly from methane in its atmosphere."},
+{name:"Neptune",color:"#567cff",size:11,orbit:420,diameter:"49,244 km",gravity:"11.15 m/s²",year:"165 Earth years",distance:"4.50 billion km",temp:"−200°C average",type:"Ice giant",moons:16,summary:"Neptune is the farthest recognised planet from the Sun. It is a cold ice giant with very fast winds."}
+];
+
+/* SOLAR SYSTEM */
+var solarAngle=0,solarPaused=false,selected=2;
+var sc=$("solarCanvas"),sx=sc.getContext("2d"),stars=[];
+for(var i=0;i<180;i++)stars.push({x:Math.random()*1000,y:Math.random()*560,r:Math.random()*1.5});
+
+function showPlanet(){
+var p=planets[selected];
+$("planetInfo").innerHTML=
+'<div class="card"><strong>SELECTED</strong>'+p.name+'</div>'+
+'<div class="card"><strong>DIAMETER</strong>'+p.diameter+'</div>'+
+'<div class="card"><strong>GRAVITY</strong>'+p.gravity+'</div>'+
+'<div class="card"><strong>YEAR</strong>'+p.year+'</div>'+
+'<div class="card"><strong>SUN DISTANCE</strong>'+p.distance+'</div>'+
+'<div class="card"><strong>TEMPERATURE</strong>'+p.temp+'</div>'+
+'<div class="card"><strong>PLANET TYPE</strong>'+p.type+'</div>'+
+'<div class="card"><strong>KNOWN MOONS</strong>'+p.moons+'</div>';
+}
+
+function drawSolar(){
+sx.fillStyle="#02040d";
+sx.fillRect(0,0,1000,560);
+
+for(var i=0;i<stars.length;i++){
+sx.fillStyle="#fff";
+sx.globalAlpha=.3+(i%4)*.15;
+sx.fillRect(stars[i].x,stars[i].y,stars[i].r+1,stars[i].r+1);
+}
+sx.globalAlpha=1;
+
+var cx=500,cy=280;
+var glow=sx.createRadialGradient(cx,cy,2,cx,cy,50);
+glow.addColorStop(0,"#fff8b0");
+glow.addColorStop(.35,"#ff9b2f");
+glow.addColorStop(1,"rgba(255,100,0,0)");
+sx.fillStyle=glow;
+sx.beginPath();sx.arc(cx,cy,50,0,Math.PI*2);sx.fill();
+sx.fillStyle="#ffe96b";
+sx.beginPath();sx.arc(cx,cy,17,0,Math.PI*2);sx.fill();
+
+for(var j=0;j<planets.length;j++){
+var p=planets[j],a=solarAngle/(p.orbit*.4)+j*.8;
+
+if($("orbits").checked){
+sx.strokeStyle="#24415c";
+sx.beginPath();
+sx.ellipse(cx,cy,p.orbit,p.orbit*.55,0,0,Math.PI*2);
+sx.stroke();
+}
+
+var x=cx+Math.cos(a)*p.orbit;
+var y=cy+Math.sin(a)*p.orbit*.55;
+
+if(p.name==="Saturn"){
+sx.strokeStyle="#e8d39a";sx.lineWidth=3;
+sx.beginPath();sx.ellipse(x,y,21,6,.2,0,Math.PI*2);sx.stroke();
+sx.lineWidth=1;
+}
+
+var g=sx.createRadialGradient(x-2,y-2,1,x,y,p.size*1.7);
+g.addColorStop(0,"#fff");g.addColorStop(.25,p.color);g.addColorStop(1,"#080e1b");
+sx.fillStyle=g;
+sx.beginPath();sx.arc(x,y,p.size,0,Math.PI*2);sx.fill();
+
+if(j===selected){
+sx.strokeStyle="#fff";
+sx.beginPath();sx.arc(x,y,p.size+5,0,Math.PI*2);sx.stroke();
+}
+sx.fillStyle="#dceaff";sx.font="12px Arial";
+sx.fillText(p.name,x+p.size+3,y+4);
+}
+}
+
+sc.addEventListener("click",function(e){
+var r=sc.getBoundingClientRect();
+var x=(e.clientX-r.left)*1000/r.width;
+var y=(e.clientY-r.top)*560/r.height;
+var best=999,index=-1;
+
+for(var j=0;j<planets.length;j++){
+var p=planets[j],a=solarAngle/(p.orbit*.4)+j*.8;
+var dx=x-500-Math.cos(a)*p.orbit;
+var dy=y-280-Math.sin(a)*p.orbit*.55;
+var d=Math.sqrt(dx*dx+dy*dy);
+if(d<best){best=d;index=j}
+}
+if(best<35 && index>=0){
+selected=index;showPlanet();
+logMessage("Selected "+planets[index].name);
+}
+});
+
+function solarLoop(){
+if(!solarPaused)solarAngle+=.0007*Number($("speed").value);
+drawSolar();
+requestAnimationFrame(solarLoop);
+}
+showPlanet();
+requestAnimationFrame(solarLoop);
+
+/* COUNTDOWN */
+var countdownTimer=null,countValue=10;
+function countdownStart(){
+if(countdownTimer)return;
+if(countValue<=0)countValue=10;
+$("countText").textContent="Launch sequence initiated!";
+$("countdown").textContent=countValue;
+countdownTimer=setInterval(function(){
+countValue--;
+if(countValue<=0){
+clearInterval(countdownTimer);countdownTimer=null;countValue=0;
+$("countdown").textContent="LIFTOFF!";
+$("countText").textContent="Simulation launch successful!";
+$("status").textContent="MISSION LAUNCHED";
+logMessage("Launch countdown complete.");
+}else{
+$("countdown").textContent=countValue;
+}
+},1000);
+}
+
+function countdownReset(){
+if(countdownTimer)clearInterval(countdownTimer);
+countdownTimer=null;countValue=10;
+$("countdown").textContent="READY";
+$("countText").textContent="Commander, prepare for launch.";
+$("status").textContent="SYSTEM ONLINE";
+}
+
+/* SPACE PILOT */
+var pc=$("pilotCanvas"),px=pc.getContext("2d");
+var ship={x:100,y:220},rocks=[],crystals=[],keys={},pilotOn=false,score=0,pilotFrame=0;
+document.addEventListener("keydown",function(e){keys[e.key.toLowerCase()]=true});
+document.addEventListener("keyup",function(e){keys[e.key.toLowerCase()]=false});
+
+function startPilot(){
+ship={x:100,y:220};rocks=[];crystals=[];score=0;pilotFrame=0;pilotOn=true;
+$("crystals").textContent="0";$("flightStatus").textContent="FLYING";
+logMessage("Space pilot launched.");
+}
+function stopPilot(){
+pilotOn=false;
+$("flightStatus").textContent="PAUSED";
+}
+
+pc.addEventListener("pointerdown",function(e){
+if(!pilotOn)return;
+var r=pc.getBoundingClientRect();
+ship.x=(e.clientX-r.left)*900/r.width;
+ship.y=(e.clientY-r.top)*440/r.height;
+});
+
+function pilotLoop(){
+px.fillStyle="#02040d";px.fillRect(0,0,900,440);
+for(var i=0;i<80;i++){
+px.fillStyle="#fff";
+px.fillRect((i*127+pilotFrame*1.5)%900,(i*61)%440,2,2);
+}
+
+if(pilotOn){
+pilotFrame++;
+if(keys.arrowup||keys.w)ship.y-=4;
+if(keys.arrowdown||keys.s)ship.y+=4;
+if(keys.arrowleft||keys.a)ship.x-=4;
+if(keys.arrowright||keys.d)ship.x+=4;
+ship.x=Math.max(15,Math.min(885,ship.x));
+ship.y=Math.max(15,Math.min(425,ship.y));
+
+if(pilotFrame%55===0)rocks.push({x:920,y:Math.random()*430,r:10+Math.random()*10});
+if(pilotFrame%90===0)crystals.push({x:920,y:30+Math.random()*380});
+
+for(var r=rocks.length-1;r>=0;r--){
+rocks[r].x-=3;
+px.fillStyle="#b2b6c3";
+px.beginPath();px.arc(rocks[r].x,rocks[r].y,rocks[r].r,0,Math.PI*2);px.fill();
+
+if(Math.abs(rocks[r].x-ship.x)<rocks[r].r+10&&Math.abs(rocks[r].y-ship.y)<rocks[r].r+10){
+pilotOn=false;
+$("flightStatus").textContent="ASTEROID HIT — RESTART";
+logMessage("Pilot mission ended after asteroid collision.");
+}
+if(rocks[r].x<0)rocks.splice(r,1);
+}
+
+for(var c=crystals.length-1;c>=0;c--){
+crystals[c].x-=3;
+px.fillStyle="#00f5ff";
+px.beginPath();px.arc(crystals[c].x,crystals[c].y,7,0,Math.PI*2);px.fill();
+
+if(Math.abs(crystals[c].x-ship.x)<18&&Math.abs(crystals[c].y-ship.y)<18){
+score++;$("crystals").textContent=score;crystals.splice(c,1);continue;
+}
+if(crystals[c].x<0)crystals.splice(c,1);
+}
+}
+
+px.save();px.translate(ship.x,ship.y);
+px.fillStyle="#eafaff";px.beginPath();
+px.moveTo(18,0);px.lineTo(-12,-10);px.lineTo(-7,0);px.lineTo(-12,10);
+px.closePath();px.fill();
+px.fillStyle="#00eaff";px.fillRect(-14,-3,6,6);
+px.restore();
+requestAnimationFrame(pilotLoop);
+}
+requestAnimationFrame(pilotLoop);
+
+/* MARS LANDING */
+var mc=$("marsCanvas"),mx=mc.getContext("2d");
+var lander={x:450,y:60,v:0},landingOn=false,landResult="Awaiting landing sequence.";
+
+function resetLanding(){
+landingOn=false;lander={x:450,y:60,v:0};
+landResult="Lander reset.";drawMars();$("landingStatus").textContent=landResult;
+}
+function startLanding(){
+lander={x:450,y:60,v:0};landingOn=true;
+landResult="Lander descending. Tap or click to steer.";
+$("landingStatus").textContent=landResult;
+logMessage("Mars landing simulation started.");
+}
+
+mc.addEventListener("pointerdown",function(e){
+if(!landingOn)return;
+var r=mc.getBoundingClientRect();
+var x=(e.clientX-r.left)*900/r.width;
+lander.x=Math.max(40,Math.min(860,x));
+});
+
+function drawMars(){
+mx.fillStyle="#080716";mx.fillRect(0,0,900,440);
+for(var i=0;i<60;i++){
+mx.fillStyle="#fff";mx.fillRect((i*149)%900,(i*53)%180,2,2);
+}
+mx.fillStyle="#b84e35";mx.fillRect(0,320,900,120);
+mx.fillStyle="#de7950";mx.beginPath();
+mx.moveTo(0,320);mx.lineTo(100,280);mx.lineTo(200,315);
+mx.lineTo(320,265);mx.lineTo(440,320);mx.lineTo(600,285);
+mx.lineTo(740,310);mx.lineTo(900,270);mx.lineTo(900,440);
+mx.lineTo(0,440);mx.fill();
+mx.fillStyle="#ffe4b5";mx.fillRect(370,319,160,5);
+mx.fillStyle="#fff";mx.font="13px Arial";mx.fillText("LANDING ZONE",400,345);
+mx.fillStyle="#e8f5ff";mx.fillRect(lander.x-12,lander.y-14,24,24);
+mx.fillStyle="#ffb52e";mx.beginPath();
+mx.moveTo(lander.x-7,lander.y+10);
+mx.lineTo(lander.x,lander.y+26+(landingOn?Math.random()*5:0));
+mx.lineTo(lander.x+7,lander.y+10);mx.fill();
+mx.fillStyle="#fff";mx.fillText("Vertical speed: "+lander.v.toFixed(1),20,25);
+}
+
+function landingLoop(){
+if(landingOn){
+lander.v+=.045;lander.y+=lander.v;
+if(lander.y>=300){
+lander.y=300;landingOn=false;
+if(lander.v<2.5)landResult="SUCCESS! Soft landing on Mars.";
+else landResult="CRASH! Landing speed was too high. Try again.";
+$("landingStatus").textContent=landResult;
+logMessage(landResult);
+}
+}
+drawMars();requestAnimationFrame(landingLoop);
+}
+requestAnimationFrame(landingLoop);
+
+/* BLACK HOLE */
+var bc=$("blackCanvas"),bx=bc.getContext("2d"),diskAngle=0,blackPaused=false;
+function toggleBlack(){
+blackPaused=!blackPaused;
+$("blackButton").textContent=blackPaused?"Resume Disk":"Pause Disk";
+}
+
+function blackLoop(){
+bx.fillStyle="#02030b";bx.fillRect(0,0,900,480);
+for(var i=0;i<120;i++){
+bx.fillStyle="#fff";bx.globalAlpha=.3+(i%4)*.15;
+bx.fillRect((i*139)%900,(i*67)%480,2,2);
+}
+bx.globalAlpha=1;
+var cx=450,cy=240;
+bx.save();bx.translate(cx,cy);bx.rotate(diskAngle);
+for(var j=0;j<22;j++){
+bx.strokeStyle="rgba(255,"+(70+j*7)+",30,"+(.12+j*.025)+")";
+bx.lineWidth=2+j*.45;
+bx.beginPath();bx.ellipse(0,0,65+j*4,20+j*1.4,0,0,Math.PI*2);bx.stroke();
+}
+bx.restore();
+var g=bx.createRadialGradient(cx,cy,15,cx,cy,60);
+g.addColorStop(0,"#000");g.addColorStop(.65,"#000");
+g.addColorStop(.8,"#17152b");g.addColorStop(1,"rgba(0,0,0,0)");
+bx.fillStyle=g;bx.beginPath();bx.arc(cx,cy,60,0,Math.PI*2);bx.fill();
+bx.fillStyle="#fff";bx.font="16px Arial";bx.fillText("BLACK HOLE",cx-48,cy+90);
+if(!blackPaused)diskAngle+=.002*Number($("diskSpeed").value);
+requestAnimationFrame(blackLoop);
+}
+requestAnimationFrame(blackLoop);
+
+/* PLANET RESEARCH */
+var pa=$("planetA"),pb=$("planetB"),lp=$("labPlanet");
+for(var i=0;i<planets.length;i++){
+pa.options.add(new Option(planets[i].name,i));
+pb.options.add(new Option(planets[i].name,i));
+lp.options.add(new Option(planets[i].name,i));
+}
+pa.value="2";pb.value="3";lp.value="2";
+
+function compare(){
+var a=planets[pa.value],b=planets[pb.value];
+var html="<table><tr><th>Property</th><th>"+a.name+"</th><th>"+b.name+"</th></tr>";
+var fields=[["Diameter","diameter"],["Gravity","gravity"],["Year","year"],["Distance","distance"],["Temperature","temp"],["Type","type"],["Known moons","moons"]];
+for(var i=0;i<fields.length;i++){
+html+="<tr><td>"+fields[i][0]+"</td><td>"+a[fields[i][1]]+"</td><td>"+b[fields[i][1]]+"</td></tr>";
+}
+$("comparison").innerHTML=html+"</table>";
+}
+compare();
+
+var facts=[
+"Mercury is the closest planet to the Sun.",
+"Venus is the hottest planet in our Solar System.",
+"Earth is the only world currently known to support life.",
+"Mars has Olympus Mons, a gigantic volcano.",
+"Jupiter is the largest planet.",
+"Saturn has a spectacular ring system.",
+"Uranus rotates with an extreme axial tilt.",
+"Neptune has extremely fast winds."
+];
+function newFact(){
+$("fact").textContent=facts[Math.floor(Math.random()*facts.length)];
+}
+
+function showLabPlanet(){
+var p=planets[lp.value];
+$("labInfo").innerHTML=
+'<div class="card"><strong>PLANET</strong>'+p.name+'</div>'+
+'<div class="card"><strong>DIAMETER</strong>'+p.diameter+'</div>'+
+'<div class="card"><strong>GRAVITY</strong>'+p.gravity+'</div>'+
+'<div class="card"><strong>ORBITAL YEAR</strong>'+p.year+'</div>'+
+'<div class="card"><strong>TYPE</strong>'+p.type+'</div>'+
+'<div class="card"><strong>KNOWN MOONS</strong>'+p.moons+'</div>';
+$("labSummary").textContent=p.summary;
+}
+function randomLabPlanet(){
+lp.value=Math.floor(Math.random()*planets.length);
+showLabPlanet();
+}
+showLabPlanet();
+
+/* MISSION CONTROL */
+var mcanvas=$("missionCanvas"),mctx=mcanvas.getContext("2d");
+var missionActive=false,missionProgress=0,missionDestination="Mars",missionFrame=0;
+
+function drawMission(){
+mctx.fillStyle="#02040d";mctx.fillRect(0,0,900,360);
+for(var i=0;i<100;i++){
+mctx.fillStyle="#fff";
+mctx.fillRect((i*127)%900,(i*71)%360,2,2);
+}
+var tx=730,ty=180;
+mctx.fillStyle="#ffcc55";mctx.beginPath();mctx.arc(100,180,28,0,Math.PI*2);mctx.fill();
+mctx.fillStyle="#ff9933";mctx.beginPath();mctx.arc(100,180,38,0,Math.PI*2);mctx.stroke();
+mctx.strokeStyle="#2e5477";mctx.setLineDash([5,7]);
+mctx.beginPath();mctx.moveTo(140,180);mctx.lineTo(690,180);mctx.stroke();
+mctx.setLineDash([]);
+
+var colors={Venus:"#e5b66d",Mars:"#f06443",Jupiter:"#d5a77c",Saturn:"#e8d39a",Neptune:"#567cff"};
+if(missionDestination==="Jupiter")tx=730;
+if(missionDestination==="Saturn")tx=780;
+if(missionDestination==="Neptune")tx=820;
+mctx.fillStyle=colors[missionDestination]||"#f06443";
+mctx.beginPath();mctx.arc(tx,ty,missionDestination==="Jupiter"?24:missionDestination==="Saturn"?20:15,0,Math.PI*2);mctx.fill();
+if(missionDestination==="Saturn"){
+mctx.strokeStyle="#e8d39a";mctx.lineWidth=4;
+mctx.beginPath();mctx.ellipse(tx,ty,34,10,.2,0,Math.PI*2);mctx.stroke();mctx.lineWidth=1;
+}
+var shipX=140+(tx-140)*missionProgress/100;
+mctx.save();mctx.translate(shipX,180);
+mctx.fillStyle="#e8f5ff";mctx.beginPath();
+mctx.moveTo(15,0);mctx.lineTo(-10,-7);mctx.lineTo(-6,0);mctx.lineTo(-10,7);
+mctx.closePath();mctx.fill();mctx.restore();
+mctx.fillStyle="#dceaff";mctx.font="15px Arial";
+mctx.fillText("SUN",80,235);
+mctx.fillText(missionDestination,tx-35,ty+48);
+mctx.fillText("MISSION ROUTE",390,150);
+requestAnimationFrame(function(){});
+}
+
+function launchMission(){
+if(missionActive)return;
+missionDestination=$("destination").value;
+missionProgress=0;missionFrame=0;missionActive=true;
+$("missionStatus").textContent="Mission launched toward "+missionDestination+"!";
+$("missionDetails").textContent="Spacecraft is travelling along its simulated route.";
+$("status").textContent="MISSION IN PROGRESS";
+logMessage("Mission launched to "+missionDestination+".");
+}
+function resetMission(){
+missionActive=false;missionProgress=0;
+$("missionProgress").style.width="0%";
+$("missionStatus").textContent="Awaiting mission instructions.";
+$("missionDetails").textContent="Choose a destination to begin.";
+$("status").textContent="SYSTEM ONLINE";
+drawMission();
+}
+function missionLoop(){
+if(missionActive){
+missionFrame++;
+if(missionFrame%3===0)missionProgress=Math.min(100,missionProgress+.5);
+$("missionProgress").style.width=missionProgress+"%";
+if(missionProgress>=100){
+missionActive=false;
+$("missionStatus").textContent="MISSION COMPLETE!";
+$("missionDetails").textContent="The simulated spacecraft reached "+missionDestination+".";
+$("status").textContent="MISSION COMPLETE";
+logMessage("Mission to "+missionDestination+" completed.");
+}
+}
+drawMission();
+requestAnimationFrame(missionLoop);
+}
+requestAnimationFrame(missionLoop);
+
+/* SPACE ACADEMY QUIZ */
+var questions=[
+{q:"Which is the largest planet?",a:["Earth","Jupiter","Mars","Venus"],c:1},
+{q:"Which planet is called the Red Planet?",a:["Mars","Mercury","Saturn","Neptune"],c:0},
+{q:"Which planet is famous for its rings?",a:["Earth","Venus","Saturn","Mars"],c:2},
+{q:"What is at the centre of our Solar System?",a:["Sirius","The Sun","Polaris","Vega"],c:1},
+{q:"Which planet is closest to the Sun?",a:["Earth","Mercury","Mars","Jupiter"],c:1},
+{q:"How many planets are in our Solar System?",a:["7","8","9","10"],c:1},
+{q:"Which planet has an extreme axial tilt?",a:["Uranus","Earth","Mars","Mercury"],c:0},
+{q:"Which planet is farthest from the Sun?",a:["Saturn","Jupiter","Neptune","Uranus"],c:2},
+{q:"What is Earth's natural satellite?",a:["The Sun","The Moon","Mars","Venus"],c:1},
+{q:"What force keeps planets in orbit?",a:["Friction","Sound","Gravity","Wind"],c:2}
+];
+
+var qi=0,qscore=0,qanswered=false;
+
+function startQuiz(){
+qi=0;qscore=0;
+$("quizFeedback").textContent="";
+showQuestion();
+}
+
+function showQuestion(){
+qanswered=false;
+if(qi>=questions.length){
+$("quizContent").innerHTML="<h3>QUIZ COMPLETE!</h3><p>You scored "+qscore+" out of "+questions.length+".</p>";
+$("quizFeedback").textContent=qscore>=7?"Excellent, Commander!":"Keep learning and try again!";
+$("quizScore").textContent="Final score: "+qscore+"/"+questions.length;
+return;
+}
+var q=questions[qi];
+var html="<h3>Question "+(qi+1)+" of "+questions.length+"</h3><p>"+q.q+"</p>";
+for(var i=0;i<q.a.length;i++){
+html+='<button class="answer" onclick="answerQuestion('+i+')">'+q.a[i]+'</button>';
+}
+$("quizContent").innerHTML=html;
+$("quizScore").textContent="Score: "+qscore;
+}
+
+function answerQuestion(choice){
+if(qanswered)return;
+qanswered=true;
+var q=questions[qi];
+if(choice===q.c){
+qscore++;
+$("quizFeedback").textContent="Correct! Great work.";
+}else{
+$("quizFeedback").textContent="Not quite! Correct answer: "+q.a[q.c];
+}
+$("quizScore").textContent="Score: "+qscore;
+var buttons=$("quizContent").querySelectorAll("button");
+buttons.forEach(function(b){b.disabled=true});
+var next=document.createElement("button");
+next.textContent=qi===questions.length-1?"See Results":"Next Question";
+next.onclick=function(){qi++;showQuestion()};
+$("quizContent").appendChild(next);
+}
+startQuiz();
+
+/* INITIALIZE */
+drawMars();
+drawMission();
+logMessage("All Explorer 23.0 modules initialized.");
+</script>
+</body>
+</html>
